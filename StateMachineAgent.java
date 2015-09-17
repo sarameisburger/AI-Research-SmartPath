@@ -77,7 +77,7 @@ public class StateMachineAgent {
 	 *
 	 */
 	public StateMachineAgent() {
-        env = new StateMachineEnvironment();
+    env = new StateMachineEnvironment();
 		alphabet = env.getAlphabet();
 		episodicMemory = new ArrayList<Episode>();
 
