@@ -71,7 +71,7 @@ public class NewAgent extends StateMachineAgent
     for (int j=0; j<(COMPARE_SIZE); j++){
       foundSequence[j] = (generateEpisodicMemory.get(lastGoalIndex-j));
     }
-    
+
 
     try {
         FileWriter csv = new FileWriter(OUTPUT_FILE2);
