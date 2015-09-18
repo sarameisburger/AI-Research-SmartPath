@@ -27,6 +27,7 @@ public class NewAgent extends StateMachineAgent
   //chance that a duplicate cmd is allowed if a random action is necessary
   double DUPLICATE_FORGIVENESS = .25; //25% chance a duplicate is permitted
   int COMPARE_SIZE = 8;
+  public static final String OUTPUT_FILE2 = "sequences.csv";
 
   /**
   *
@@ -44,13 +45,13 @@ public class NewAgent extends StateMachineAgent
 
   protected int generateQualityScore(){
 
-    char[] originalSequence = new char[COMPARE_SIZE];
-    char[] foundSequence = new char[COMPARE_SIZE];
+    Episode[] originalSequence = new Episode[COMPARE_SIZE];
+    Episode[] foundSequence = new Episode[COMPARE_SIZE];
     int lastGoalIndex = findLastGoal(episodicMemory.size());
-    int qualityScore = 0//var to be returned
+    int qualityScore = 0;//var to be returned
 
     if (lastGoalIndex == -1) {
-        return scoreInfo;//since init to 0's the ending score will be poor
+        return qualityScore;//since init to 0's the ending score will be poor
     }
 
     //If we've just reached the goal in the last 7 steps, then generate random steps until long enough
@@ -61,20 +62,32 @@ public class NewAgent extends StateMachineAgent
     }
 
     //fill the two arrays we will be comparing
-    for (i=generateEpisodicMemory.size()-1; i<generateEpisodicMemory.size()-(COMPARE_SIZE-1); i--){
-      originalSequence[i] = generateEpisodicMemory[generateEpisodicMemory.size()-1-i];
+    for (int i=generateEpisodicMemory.size()-1; i<generateEpisodicMemory.size()-(COMPARE_SIZE-1); i--){
+      originalSequence[i] = (generateEpisodicMemory.get(generateEpisodicMemory.size()-1-i));
     }
-    for (j=0; j<(COMPARE_SIZE-1); j++){
-      foundSequence[j] = generateEpisodicMemory[lastGoalIndex-j];
+    for (int j=0; j<(COMPARE_SIZE-1); j++){
+      foundSequence[j] = (generateEpisodicMemory.get(lastGoalIndex-j));
     }
 
+    try {
+        FileWriter csv = new FileWriter(OUTPUT_FILE2);
+        for(int i=0; i<8; i++){
+          csv.append(originalSequence[i].command);
+        }
+        for(int i=0; i<8; i++){
+          csv.append(foundSequence[i].command);
+        }
+
+        csv.close();
+      }
+      catch (IOException e) {
+          System.out.println("tryAllCombos: Could not create file, what a noob...");
+          System.exit(-1);
+      }
     //test to see if works
-    for(i=0; i<8; i++){
-      System.out.print(originalSequence[i]);
-    }
-    for(i=0; i<8; i++){
-      System.out.print(foundSequence[i]);
-    }
+
+
+    return qualityScore;
 
   }
   public char generateRandomAction() {
@@ -98,4 +111,6 @@ public class NewAgent extends StateMachineAgent
 
 		return possibleCmd;
 	}
+
+
 }
