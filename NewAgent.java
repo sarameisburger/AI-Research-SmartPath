@@ -55,39 +55,23 @@ public class NewAgent extends StateMachineAgent
         return qualityScore;
     }
 
-<<<<<<< Updated upstream
 
     //If we've just reached the goal in the last 8 characters, then generate random steps until long enough
     for(int i=0; i< COMPARE_SIZE; i++){
       if (lastGoalIndex == episodicMemory.size() - i){
-=======
-    //If we've just reached the goal in the last 7 steps,
-    //then generate random steps until we have an originalSequence
-    // of length COMPARE_SIZE
-    if (lastGoalIndex == episodicMemory.size() - 7)
-    {
->>>>>>> Stashed changes
         generateRandomAction();
         generateQualityScore();
     }
 
-<<<<<<< Updated upstream
+
     //fill the two arrays we will be comparing with 8 episodes
     for (int i=0; i<COMPARE_SIZE; i++){
       originalSequence[i] = (generateEpisodicMemory.get(generateEpisodicMemory.size()-i));
 
     for (int j=0; j<(COMPARE_SIZE); j++){
-=======
-
-    //fill the two arrays we will be comparing
-    for (int i=generateEpisodicMemory.size()-1; i<generateEpisodicMemory.size()-(COMPARE_SIZE-1); i--){
-      originalSequence[i] = (generateEpisodicMemory.get(generateEpisodicMemory.size()-1-i));
-    }
-    //j<(COMPARE_SIZE)????
-    for (int j=0; j<(COMPARE_SIZE-1); j++){
->>>>>>> Stashed changes
       foundSequence[j] = (generateEpisodicMemory.get(lastGoalIndex-j));
     }
+    
 
     try {
         FileWriter csv = new FileWriter(OUTPUT_FILE2);
