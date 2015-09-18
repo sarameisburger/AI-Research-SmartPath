@@ -51,22 +51,41 @@ public class NewAgent extends StateMachineAgent
     int qualityScore = 0;//var to be returned
 
     if (lastGoalIndex == -1) {
-        return qualityScore;//since init to 0's the ending score will be poor
+        //since qualityScore has been init to 0, the ending score will be poor
+        return qualityScore;
     }
 
+<<<<<<< Updated upstream
     //If we've just reached the goal in the last 8 characters, then generate random steps until long enough
     for(int i=0; i< COMPARE_SIZE; i++){
       if (lastGoalIndex == episodicMemory.size() - i){
+=======
+    //If we've just reached the goal in the last 7 steps,
+    //then generate random steps until we have an originalSequence
+    // of length COMPARE_SIZE
+
+    //A LITTLE CONFUSED ABOUT HOW THIS WORKS...
+    if (lastGoalIndex == episodicMemory.size() - 7)
+    {
+>>>>>>> Stashed changes
         generateRandomAction();
         generateQualityScore();
       }
     }
 
+<<<<<<< Updated upstream
 
     //fill the two arrays we will be comparing with 8 episodes
     for (int i=0; i<COMPARE_SIZE; i++){
       originalSequence[i] = (generateEpisodicMemory.get(generateEpisodicMemory.size()-i));
+=======
+    //WHY DOES i NEED TO BE < generateEpisodicMemory.size()-(COMPARE_SIZE-1) 
+    //fill the two arrays we will be comparing
+    for (int i=generateEpisodicMemory.size()-1; i<generateEpisodicMemory.size()-(COMPARE_SIZE-1); i--){
+      originalSequence[i] = (generateEpisodicMemory.get(generateEpisodicMemory.size()-1-i));
+>>>>>>> Stashed changes
     }
+    //j<(COMPARE_SIZE)????
     for (int j=0; j<(COMPARE_SIZE-1); j++){
       foundSequence[j] = (generateEpisodicMemory.get(lastGoalIndex-j));
     }
