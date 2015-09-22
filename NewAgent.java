@@ -1,9 +1,17 @@
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Collections;
+import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.FileOutputStream;
+
+
 /**
  * class NewAgent
  *
@@ -17,23 +25,14 @@ import java.util.Collections;
  * @author: Sara Meisburger and Christine Chen
  *
  */
-<<<<<<< HEAD
-=======
- import java.io.FileWriter;
- import java.io.IOException;
- import java.util.ArrayList;
- import java.util.Arrays;
- import java.util.Random;
- import java.util.Collections;
- import java.util.Scanner;
- import java.io.File;
- import java.io.FileNotFoundException;
- import java.io.PrintWriter;
- import java.io.FileOutputStream;
-
->>>>>>> master
 public class NewAgent extends StateMachineAgent
 {
+
+  public static void main (String[] args)
+  {
+    System.out.print("Hello World!");
+  }
+  
   //VARIABLES////////////////////////////
 
   //episodic memory generated
@@ -47,12 +46,11 @@ public class NewAgent extends StateMachineAgent
   Episode tempEpisode;
 
   /**
-  *
+  * MADE CHANGES TO NEW AGENT CONSTRUCTOR SINCE LAST COMMIT!!!
   */
-  //public static void main(String[] args)
   public NewAgent()
   {
-<<<<<<< HEAD
+
     //set up environment in order to
     //initialize alphabet array (inherited from StateMachineAgent)
     env = new StateMachineEnvironment();
@@ -61,17 +59,15 @@ public class NewAgent extends StateMachineAgent
     //make sure the agent's memory is all spic and span
     generateEpisodicMemory.clear();
 
-    //call generateRandomAction///////////////////////
-    generateEpisodicMemory =
-=======
     //create a StateMachineAgent object, have it
     //roam around for a while, and then stash its episodic memory
     //away in genEpisodicMemory
     //StateMachineAgent gilligan = new StateMachineAgent();
     //gilligan.exploreEnvironment();
     //generateEpisodicMemory = gilligan.episodicMemory;
+    //call generateRandomEpisodes//////////////////////
     generateRandomEpisodes(100);
->>>>>>> master
+
   }
 
   protected int generateQualityScore(){
@@ -97,16 +93,10 @@ public class NewAgent extends StateMachineAgent
 
 
     //fill the two arrays we will be comparing with 8 episodes
-<<<<<<< HEAD
-    //GENERATEEPISODICMEMORY.SIZE()-i-1
-    for (int i=0; i<COMPARE_SIZE; i++){
-      originalSequence[i] = (generateEpisodicMemory.get(generateEpisodicMemory.size()-i));
-=======
-    for (int k=0; k<COMPARE_SIZE; k++){
+    for (int k=1; k<=COMPARE_SIZE; k++){
       originalSequence[i] = (generateEpisodicMemory.get(generateEpisodicMemory.size()-k));
->>>>>>> master
 
-    for (int j=0; j<(COMPARE_SIZE); j++){
+    for (int j=1; j<=(COMPARE_SIZE); j++){
       foundSequence[j] = (generateEpisodicMemory.get(lastGoalIndex-j));
     }
 
@@ -199,4 +189,78 @@ return qualityScore;
   public char getChar(Episode epi){
     return epi.command;
   }
+
+
+/*
+* creates a positional weight matrix based on originalEpisodes
+* and calculates a positional weight matrix score for foundEpisodes based
+* on the matrix
+*
+*/
+private double calcPWMScore(Episode[] originalEpisodes, Episode[] foundEpisodes)
+{
+  //convert Episode arrays into char arrays
+  char[] originalChars = new char[COMPARE_SIZE];
+  char[] foundChars = new char[COMPARE_SIZE];
+
+  for (int i = 0; i<COMPARE_SIZE; i++)
+  {
+    originalChars[i] = originalEpisodes[i].command;
+    foundChars[i] = foundEpisodes[i].command;
+  }
+
+  //create 2D array to house the positional weight matrix that will
+  //be created based on originalChars
+  //number of rows should be number of letters in alphabet (a->row 0, b->row 1, etc.)
+  //number of columns should be the length of the char arrays
+  double[][] pwm = new double [alphabet.length][COMPARE_SIZE];
+
+  //might want to initialize each position in pwm to 0.0 in the future
+
+  //arbitrary values subject to change
+  double high_score = .91;
+  double low_score = .09/(alphabet.length-1);
+
+  //start putting values into pwm
+  //outer loop is keeping track of the column number, k, and k
+  //corresponds to the kth position in originalChars
+  for (int k = 0; k<COMPARE_SIZE; k++)
+  {
+    //what row number does the character in originalChars[k]
+    //correspond to?
+    int charRowNumber = this.indexOfCharacter(originalChars[k]);
+
+    //orginalChars[k] is the correct character for this spot,
+    //so it gets a high_score
+    pwm[charRowNumber][k] = high_score;
+
+    //every other element in this column gets a low_score
+    for(int row = 0; row<pwm.length; row++)
+    {
+      if(row != charRowNumber)
+      {
+        pwm[row][k] = low_score;
+      }
+
+    }
+
+  }
+
+  double scoreToReturn = 1.0;
+
+  //now calculate the pwm score of foundChars based on the matrix
+  //k corresponds to the kth position in foundChars
+  for (int k = 0; k<COMPARE_SIZE; k++)
+  {
+    //what row number does the character in foundChars[k]
+    //correspond to?
+    int charRowNumber = this.indexOfCharacter(foundChars[k]);
+    scoreToReturn = scoreToReturn * pwm[charRowNumber][k];
+  }
+
+  return scoreToReturn;
+
+}
+
+
 }
