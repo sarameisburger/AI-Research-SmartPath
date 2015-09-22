@@ -18,6 +18,11 @@
  import java.util.Arrays;
  import java.util.Random;
  import java.util.Collections;
+ import java.util.Scanner;
+ import java.io.File;
+ import java.io.FileNotFoundException;
+ import java.io.PrintWriter;
+ import java.io.FileOutputStream;
 
 public class NewAgent extends StateMachineAgent
 {
@@ -28,6 +33,7 @@ public class NewAgent extends StateMachineAgent
   double DUPLICATE_FORGIVENESS = .25; //25% chance a duplicate is permitted
   int COMPARE_SIZE = 8;
   public static final String OUTPUT_FILE2 = "sequences.csv";
+  Episode tempEpisode;
 
   /**
   *
@@ -38,9 +44,10 @@ public class NewAgent extends StateMachineAgent
     //create a StateMachineAgent object, have it
     //roam around for a while, and then stash its episodic memory
     //away in genEpisodicMemory
-    StateMachineAgent gilligan = new StateMachineAgent();
-    gilligan.exploreEnvironment();
-    generateEpisodicMemory = gilligan.episodicMemory;
+    //StateMachineAgent gilligan = new StateMachineAgent();
+    //gilligan.exploreEnvironment();
+    //generateEpisodicMemory = gilligan.episodicMemory;
+    generateRandomEpisodes(100);
   }
 
   protected int generateQualityScore(){
@@ -65,8 +72,8 @@ public class NewAgent extends StateMachineAgent
 
 
     //fill the two arrays we will be comparing with 8 episodes
-    for (int i=0; i<COMPARE_SIZE; i++){
-      originalSequence[i] = (generateEpisodicMemory.get(generateEpisodicMemory.size()-i));
+    for (int k=0; k<COMPARE_SIZE; k++){
+      originalSequence[i] = (generateEpisodicMemory.get(generateEpisodicMemory.size()-k));
 
     for (int j=0; j<(COMPARE_SIZE); j++){
       foundSequence[j] = (generateEpisodicMemory.get(lastGoalIndex-j));
@@ -75,11 +82,11 @@ public class NewAgent extends StateMachineAgent
 
     try {
         FileWriter csv = new FileWriter(OUTPUT_FILE2);
-        for(int i=0; i<8; i++){
-          csv.append(originalSequence[i].command);
+        for(int q=0; q<8; q++){
+          csv.append(originalSequence[q].command);
         }
-        for(int i=0; i<8; i++){
-          csv.append(foundSequence[i].command);
+        for(int p=0; p<8; p++){
+          csv.append(foundSequence[p].command);
         }
 
         csv.close();
@@ -91,10 +98,12 @@ public class NewAgent extends StateMachineAgent
     //test to see if works
 
 
-    return qualityScore;
-
   }
-  public char generateRandomAction() {
+}
+return qualityScore;
+}
+
+  protected char generateRandomAction(){
         //decide if a dup command is acceptable
         double chanceForDup = Math.random();
         boolean dupPermitted = false;
@@ -116,5 +125,47 @@ public class NewAgent extends StateMachineAgent
 		return possibleCmd;
 	}
 
+  protected ArrayList<Episode> generateRandomEpisodes(int length){
+    //generate random episodes based on chosen length
+    for(int i=0; i<length; i++){
+      //create a random episode
+      Episode tempEpisode = null;
+      tempEpisode.command = generateRandomAction();
+      tempEpisode.sensorValue = randomAtGoal(50);
+      generateEpisodicMemory.add(tempEpisode);
+    }
+    //PrintWriter writer = new PrintWriter ("outputfile2.txt");
+    //PrintWriter out = new PrintWriter(new FileWriter("users\\sarameisburger\\Desktop\\outputfile2.txt"));
+    save(generateEpisodicMemory);
+    return generateEpisodicMemory;
 
+  }
+
+  public void save(ArrayList<Episode> output) {
+  try {
+    PrintWriter pw = new PrintWriter(new FileOutputStream(OUTPUT_FILE2));
+  for (Episode episode : output)
+      pw.println(episode.command);
+  pw.close();
+}
+  catch (IOException e) {
+    System.out.println("tryAllCombos: Could not create file, what a noob...");
+    System.exit(-1);
+}
+}
+
+  //randomly gives an "at goal?" value of 0 or 1
+  public int randomAtGoal(int probability){
+    int atGoal = (int)(Math.random()*probability);
+    if(atGoal == 0){
+      return 1; //say it reeached the goal
+    }
+    else {
+      return 0; //otherwise it did not reach the goal
+    }
+  }
+
+  public char getChar(Episode epi){
+    return epi.command;
+  }
 }
