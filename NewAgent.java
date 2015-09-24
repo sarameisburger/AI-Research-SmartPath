@@ -273,8 +273,10 @@ return qualityScore;
         }
       }
     }
-    System.out.print("score");
-    return score;
+    //get max number of subsequences possible with sequence length
+    int maxSubSeq = ((COMPARE_SIZE)^2+(COMPARE_SIZE))/2;
+    int finalCountingScore = score/maxSubSeq;
+    return finalCountingScore;
   }
 
 }
