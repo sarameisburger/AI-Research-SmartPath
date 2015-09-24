@@ -172,6 +172,62 @@ return qualityScore;
   public char getChar(Episode epi){
     return epi.command;
   }
+
+  protected int generateQualityScore(){
+
+    Episode[] originalSequence = new Episode[COMPARE_SIZE];
+    Episode[] foundSequence = new Episode[COMPARE_SIZE];
+    int lastGoalIndex = findLastGoal(episodicMemory.size());
+    int qualityScore = 0;//var to be returned
+
+    if (lastGoalIndex == -1) {
+        //since qualityScore has been init to 0, the ending score will be poor
+        return qualityScore;
+    }
+
+
+    //If we've just reached the goal in the last 8 characters, then generate random steps
+    //until we have a long enough original sequence
+    for(int i=0; i< COMPARE_SIZE; i++){
+      if (lastGoalIndex == episodicMemory.size() - i){
+        generateRandomAction();
+        generateQualityScore();
+    }
+
+
+    //fill the two arrays we will be comparing with 8 episodes
+    //GENERATEEPISODICMEMORY.SIZE()-i-1
+    for (int i=0; i<COMPARE_SIZE; i++){
+      originalSequence[i] = (generateEpisodicMemory.get(generateEpisodicMemory.size()-i));
+
+    for (int j=0; j<(COMPARE_SIZE); j++){
+      foundSequence[j] = (generateEpisodicMemory.get(lastGoalIndex-j));
+    }
+
+
+    try {
+        FileWriter csv = new FileWriter(OUTPUT_FILE2);
+        for(int i=0; i<8; i++){
+          csv.append(originalSequence[i].command);
+        }
+        for(int i=0; i<8; i++){
+          csv.append(foundSequence[i].command);
+        }
+
+        csv.close();
+      }
+      catch (IOException e) {
+          System.out.println("tryAllCombos: Could not create file, what a noob...");
+          System.exit(-1);
+      }
+    //test to see if works
+
+
+    return qualityScore;
+
+  }
+}
+}
 /**
 *Step by step what this method does
 * 1. turns the array of characters found and original, into one long string each
