@@ -1,3 +1,14 @@
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.Collections;
+import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.FileOutputStream;
 
 /**
  * class NewAgent
@@ -12,17 +23,7 @@
  * @author: Sara Meisburger and Christine Chen
  *
  */
- import java.io.FileWriter;
- import java.io.IOException;
- import java.util.ArrayList;
- import java.util.Arrays;
- import java.util.Random;
- import java.util.Collections;
- import java.util.Scanner;
- import java.io.File;
- import java.io.FileNotFoundException;
- import java.io.PrintWriter;
- import java.io.FileOutputStream;
+
 
 public class NewAgent extends StateMachineAgent
 {
@@ -48,6 +49,7 @@ public class NewAgent extends StateMachineAgent
     //gilligan.exploreEnvironment();
     //generateEpisodicMemory = gilligan.episodicMemory;
     generateRandomEpisodes(100);
+    System.out.print("score");
   }
 
   protected int generateQualityScore(){
@@ -72,12 +74,14 @@ public class NewAgent extends StateMachineAgent
 
 
     //fill the two arrays we will be comparing with 8 episodes
-    for (int k=0; k<COMPARE_SIZE; k++){
+    for (int k=1; k<=COMPARE_SIZE; k++){ //WE CHANGED THIS ON BOTH BRANCHES
       originalSequence[i] = (generateEpisodicMemory.get(generateEpisodicMemory.size()-k));
 
-    for (int j=0; j<(COMPARE_SIZE); j++){
+    for (int j=1; j<=COMPARE_SIZE; j++){
       foundSequence[j] = (generateEpisodicMemory.get(lastGoalIndex-j));
     }
+
+    getCountingScore(originalSequence, foundSequence);
 
 
     try {
@@ -168,4 +172,109 @@ return qualityScore;
   public char getChar(Episode epi){
     return epi.command;
   }
+
+  protected int generateQualityScore(){
+
+    Episode[] originalSequence = new Episode[COMPARE_SIZE];
+    Episode[] foundSequence = new Episode[COMPARE_SIZE];
+    int lastGoalIndex = findLastGoal(episodicMemory.size());
+    int qualityScore = 0;//var to be returned
+
+    if (lastGoalIndex == -1) {
+        //since qualityScore has been init to 0, the ending score will be poor
+        return qualityScore;
+    }
+
+
+    //If we've just reached the goal in the last 8 characters, then generate random steps
+    //until we have a long enough original sequence
+    for(int i=0; i< COMPARE_SIZE; i++){
+      if (lastGoalIndex == episodicMemory.size() - i){
+        generateRandomAction();
+        generateQualityScore();
+    }
+
+
+    //fill the two arrays we will be comparing with 8 episodes
+    //GENERATEEPISODICMEMORY.SIZE()-i-1
+    for (int i=0; i<COMPARE_SIZE; i++){
+      originalSequence[i] = (generateEpisodicMemory.get(generateEpisodicMemory.size()-i));
+
+    for (int j=0; j<(COMPARE_SIZE); j++){
+      foundSequence[j] = (generateEpisodicMemory.get(lastGoalIndex-j));
+    }
+
+
+    try {
+        FileWriter csv = new FileWriter(OUTPUT_FILE2);
+        for(int i=0; i<8; i++){
+          csv.append(originalSequence[i].command);
+        }
+        for(int i=0; i<8; i++){
+          csv.append(foundSequence[i].command);
+        }
+
+        csv.close();
+      }
+      catch (IOException e) {
+          System.out.println("tryAllCombos: Could not create file, what a noob...");
+          System.exit(-1);
+      }
+    //test to see if works
+
+
+    return qualityScore;
+
+  }
+}
+}
+/**
+*Step by step what this method does
+* 1. turns the array of characters found and original, into one long string each
+* 2. iterates through each the found string and original string and finds all subsequences
+* 3. compares each subsequence to the other, if it finds one it moves on to avoid overcounting
+
+*/
+
+  public int getCountingScore(Episode[] original, Episode[] found){
+    ArrayList<String> originalSubsequences = null;
+    ArrayList<String> foundSubsequences = null;
+    int count = 0; //counter for how many subsequences match
+    int score = 0; //score for matching subsequences, longer sub = higher score
+
+    String originalString = original.toString(); //make arrays into string to get subsequences
+    String foundString = found.toString();
+
+    //get arraylist of subsequences for original
+    for(int i=0; i<originalString.length(); i++){ // i determines length of string
+      for(int j=0; j<originalString.length()-i; j++){ // j determines where we start (indice) in string
+        originalSubsequences.add(originalString.substring(j,j+i));
+      }
+    }
+    //get arraylist of subsequences for found
+    for(int g=0; g<foundString.length(); g++){
+      for(int f=0; f<foundString.length()-g; f++){
+        foundSubsequences.add(foundString.substring(f,f+g));
+      }
+    }
+    //for each subsequence in original, compare to see if it is in found list of subsequences
+    for(int p=0; p<originalSubsequences.size(); p++){
+      for(int q=0; q<foundSubsequences.size(); q++){
+        if(originalSubsequences.get(p).equals(foundSubsequences.get(q))){
+          count++;
+          score = originalSubsequences.get(p).length() + score;
+          foundSubsequences.remove(q); //avoid overcounting, once counted, remove
+          //p++;
+          break;
+           //if found matching sequence, move on to next i so we don't repeat counting
+          //use break instead of p++ to get out of inner for loop
+          //generate number between 0 and 1 for score...divide by max score 1=best
+          //fairly evenly
+        }
+      }
+    }
+    System.out.print("score");
+    return score;
+  }
+
 }
