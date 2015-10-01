@@ -29,7 +29,7 @@ public class StateMachineAgent {
     public static final int NUM_MACHINES = 100;
 
     /** Number of episodes per run */
-    public static final int MAX_EPISODES = 5000;
+    public static final int MAX_EPISODES = 50;
 
     //filename to store experimental results
     public static final String OUTPUT_FILE = "AIReport.csv";
