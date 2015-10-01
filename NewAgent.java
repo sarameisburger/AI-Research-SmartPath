@@ -348,20 +348,26 @@ public static void main(String [ ] args) {
 }
 
 private void checkConditions(int lastGoalIndex){
-  private boolean atGoal = false;
+  int atGoal = -1;
 
   while (lastGoalIndex == -1) {
     System.out.println("we are checking conditions");
   //since qualityScore has been init to 0, the ending score will be poor
-  generateSemiRandomAction();
+  char randomChar  = generateSemiRandomAction();
+  tryPath(stringToPath(Character.toString(randomChar)));
+  atGoal = episodicMemory.get(episodicMemory.size()-1).sensorValue;
+  if(atGoal == 1){
+    break;
+  }
   lastGoalIndex = findLastGoal(episodicMemory.size()-1);
   }
 
 
 //If we've just reached the goal in the last 8 characters, then generate random steps until long enough
     while (lastGoalIndex > episodicMemory.size() - COMPARE_SIZE || episodicMemory.size() < COMPARE_SIZE || lastGoalIndex < COMPARE_SIZE){
-    generateSemiRandomAction();
-
+      System.out.println("In the second while loop");
+    char randomAction = generateSemiRandomAction();
+    tryPath(stringToPath(Character.toString(randomAction)));
     lastGoalIndex = findLastGoal(episodicMemory.size()-1);
   }
 }
@@ -370,7 +376,7 @@ private Episode[] getOriginalSequence(){
   //fill the array we will be comparing with 8 episodes
   Episode[] originalSequence = new Episode[COMPARE_SIZE];
   for (int k=1; k<=COMPARE_SIZE; k++){ //WE CHANGED THIS ON BOTH BRANCHES
-    originalSequence[k] = (episodicMemory.get(episodicMemory.size()-k));
+    originalSequence[k-1] = (episodicMemory.get(episodicMemory.size()-k));
   }
   return originalSequence;
 }
@@ -378,7 +384,7 @@ private Episode[] getOriginalSequence(){
 private Episode[] getFoundSequence(int indice){
   Episode[] foundSequence = new Episode[COMPARE_SIZE];
   for (int j=1; j<=COMPARE_SIZE; j++){
-    foundSequence[j] = (episodicMemory.get(indice));
+    foundSequence[j-1] = (episodicMemory.get(indice));
     indice--;
   }
   return foundSequence;

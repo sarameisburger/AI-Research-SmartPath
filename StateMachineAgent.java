@@ -26,7 +26,7 @@ public class StateMachineAgent {
 	public static final int GOAL = 2;
 
     /** Number of state machines to test a given constant combo with */
-    public static final int NUM_MACHINES = 100;
+    public static final int NUM_MACHINES = 10;
 
     /** Number of episodes per run */
     public static final int MAX_EPISODES = 50;
